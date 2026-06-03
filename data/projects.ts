@@ -54,14 +54,6 @@ export const projects: Project[] = [
     images: IMAGES,
   },
   {
-    slug: 'framework',
-    title: 'Framework',
-    company: 'Pennylane',
-    year: '2023',
-    description: LOREM,
-    images: IMAGES,
-  },
-  {
     slug: 'sepa-instant-out',
     title: 'SEPA Instant Out',
     company: 'Qonto',
