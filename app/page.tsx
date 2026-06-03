@@ -2,13 +2,56 @@ import { projects } from '@/data/projects'
 import PortfolioLayout from '@/components/PortfolioLayout'
 import type { ContributionDay } from '@/types/github'
 
-async function getContributions(): Promise<ContributionDay[] | null> {
-  const year = new Date().getFullYear()
+const USERNAME = 'anthonyzaccardi'
 
-  // 1st try: jogruber contributions API
+async function getContributions(): Promise<ContributionDay[] | null> {
+  // 1. Scrape GitHub contribution HTML — server-side, no CORS, includes private
   try {
     const res = await fetch(
-      `https://github-contributions-api.jogruber.de/v4/anthonyzaccardi?y=${year}`,
+      `https://github.com/users/${USERNAME}/contributions`,
+      {
+        headers: {
+          Accept: 'text/html',
+          'User-Agent': 'Mozilla/5.0',
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        next: { revalidate: 3600 },
+        signal: AbortSignal.timeout(8000),
+      }
+    )
+    if (res.ok) {
+      const html = await res.text()
+      const days: ContributionDay[] = []
+
+      // Try pattern with data-count + data-level
+      const re1 = /data-date="(\d{4}-\d{2}-\d{2})"[^>]*data-count="(\d+)"[^>]*data-level="(\d)"/g
+      let m: RegExpExecArray | null
+      while ((m = re1.exec(html)) !== null) {
+        days.push({
+          date: m[1],
+          count: parseInt(m[2]),
+          level: parseInt(m[3]) as ContributionDay['level'],
+        })
+      }
+
+      // Fallback: data-level only → approximate count
+      if (days.length === 0) {
+        const re2 = /data-date="(\d{4}-\d{2}-\d{2})"[^>]*data-level="(\d)"/g
+        while ((m = re2.exec(html)) !== null) {
+          const level = parseInt(m[2]) as ContributionDay['level']
+          days.push({ date: m[1], count: level > 0 ? level * 2 : 0, level })
+        }
+      }
+
+      if (days.length > 0) return days.slice(-60)
+    }
+  } catch {}
+
+  // 2. jogruber API fallback
+  try {
+    const year = new Date().getFullYear()
+    const res = await fetch(
+      `https://github-contributions-api.jogruber.de/v4/${USERNAME}?y=${year}`,
       { next: { revalidate: 3600 }, signal: AbortSignal.timeout(5000) }
     )
     if (res.ok) {
@@ -18,10 +61,10 @@ async function getContributions(): Promise<ContributionDay[] | null> {
     }
   } catch {}
 
-  // 2nd try: GitHub REST public events (no auth, 60req/hr)
+  // 3. GitHub public events fallback (public repos only)
   try {
     const res = await fetch(
-      'https://api.github.com/users/anthonyzaccardi/events/public?per_page=100',
+      `https://api.github.com/users/${USERNAME}/events/public?per_page=100`,
       { next: { revalidate: 3600 }, signal: AbortSignal.timeout(5000) }
     )
     if (res.ok) {

@@ -16,34 +16,15 @@ function ImageFrame({ src, alt }: { src: string; alt: string }) {
         height: 602,
         width: '100%',
         overflow: 'hidden',
-        position: 'relative',
-        flexShrink: 0,
         borderRadius: 2,
+        flexShrink: 0,
       }}
     >
-      <div
-        style={{
-          position: 'absolute',
-          left: '50%',
-          top: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: '86%',
-          maxWidth: 791,
-          height: '82%',
-          maxHeight: 494,
-          borderRadius: 4,
-          border: '1px solid #E0E0E0',
-          boxShadow: '0px 1px 3px -1px rgba(0,0,0,0.12), 0px 0px 30px -5px rgba(0,0,0,0.10)',
-          overflow: 'hidden',
-          background: '#fff',
-        }}
-      >
-        <img
-          src={src}
-          alt={alt}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-        />
-      </div>
+      <img
+        src={src}
+        alt={alt}
+        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+      />
     </div>
   )
 }
@@ -60,7 +41,7 @@ export default function ProjectSection({ project, index }: Props) {
     >
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 24 }}>
-        {/* Counter + title — nowrap so long titles stay on one line */}
+        {/* Counter + title */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
           <div
             style={{
@@ -75,7 +56,6 @@ export default function ProjectSection({ project, index }: Props) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontVariantNumeric: 'tabular-nums',
               flexShrink: 0,
             }}
           >
@@ -99,7 +79,7 @@ export default function ProjectSection({ project, index }: Props) {
         )}
       </div>
 
-      {/* Images */}
+      {/* Images — full bleed */}
       {project.images.map((src, i) => (
         <ImageFrame key={i} src={src} alt={`${project.title} — ${i + 1}`} />
       ))}
