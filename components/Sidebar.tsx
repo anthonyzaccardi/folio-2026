@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import GitHubGraph from './GitHubGraph'
-import { useClickSound } from '@/hooks/useClickSound'
 import type { Project } from '@/data/projects'
 import type { ContributionDay } from '@/types/github'
 
@@ -55,7 +54,6 @@ interface Props {
 }
 
 export default function Sidebar({ projects, activeSlug, onSelect, contributions }: Props) {
-  const playClick = useClickSound()
 
   return (
     <aside style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -122,7 +120,7 @@ export default function Sidebar({ projects, activeSlug, onSelect, contributions 
           {projects.map((p) => (
             <button
               key={p.slug}
-              onClick={() => { playClick(); onSelect(p.slug) }}
+              onClick={() => onSelect(p.slug)}
               style={{
                 display: 'block',
                 width: '100%',
