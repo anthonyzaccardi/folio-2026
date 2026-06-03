@@ -10,20 +10,11 @@ interface Props {
 
 function ImageFrame({ src, alt }: { src: string; alt: string }) {
   return (
-    <div
-      style={{
-        background: '#F6F6F6',
-        height: 602,
-        width: '100%',
-        overflow: 'hidden',
-        borderRadius: 2,
-        flexShrink: 0,
-      }}
-    >
+    <div style={{ width: '100%', background: '#F6F6F6', borderRadius: 2, overflow: 'hidden' }}>
       <img
         src={src}
         alt={alt}
-        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+        style={{ width: '100%', height: 'auto', display: 'block' }}
       />
     </div>
   )
@@ -39,24 +30,13 @@ export default function ProjectSection({ project, index }: Props) {
       transition={{ duration: 0.22, ease: 'easeOut' }}
       style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
     >
-      {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 24 }}>
-        {/* Counter + title */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
           <div
             style={{
-              background: '#000',
-              color: '#fff',
-              fontSize: 12,
-              fontWeight: 700,
-              lineHeight: '18px',
-              minWidth: 20,
-              padding: '1px 4px',
-              borderRadius: 8,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
+              background: '#000', color: '#fff', fontSize: 12, fontWeight: 700,
+              lineHeight: '18px', minWidth: 20, padding: '1px 4px', borderRadius: 8,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
             }}
           >
             {index + 1}
@@ -70,16 +50,12 @@ export default function ProjectSection({ project, index }: Props) {
             </p>
           </div>
         </div>
-
-        {/* Description */}
         {project.description && (
           <p style={{ fontSize: 14, lineHeight: '20px', color: '#BDBDBD', flex: 1, maxWidth: 624 }}>
             {project.description}
           </p>
         )}
       </div>
-
-      {/* Images — full bleed */}
       {project.images.map((src, i) => (
         <ImageFrame key={i} src={src} alt={`${project.title} — ${i + 1}`} />
       ))}
