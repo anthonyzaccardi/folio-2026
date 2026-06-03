@@ -15,14 +15,12 @@ export default function PortfolioLayout({ projects, contributions }: Props) {
   const [activeSlug, setActiveSlug] = useState(projects[0].slug)
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  // Scroll right panel to the project section
   const scrollTo = useCallback((slug: string) => {
     const el = document.getElementById(slug)
     if (!el) return
     el.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }, [])
 
-  // IntersectionObserver: track which section is in the top half of the scroll panel
   useEffect(() => {
     const container = scrollRef.current
     if (!container) return
@@ -33,11 +31,7 @@ export default function PortfolioLayout({ projects, contributions }: Props) {
           if (entry.isIntersecting) setActiveSlug(entry.target.id)
         })
       },
-      {
-        root: container,
-        threshold: 0,
-        rootMargin: '0px 0px -65% 0px',
-      }
+      { root: container, threshold: 0, rootMargin: '0px 0px -65% 0px' }
     )
 
     projects.forEach((p) => {
@@ -50,16 +44,16 @@ export default function PortfolioLayout({ projects, contributions }: Props) {
 
   return (
     <>
-      {/* Fixed left sidebar */}
+      {/* Fixed left panel — full height, 80px padding bottom for graph */}
       <div
         style={{
           position: 'fixed',
           left: 64,
-          top: 64,
+          top: 0,
+          bottom: 0,
           width: 329,
-          maxHeight: 'calc(100vh - 128px)',
-          overflowY: 'auto',
-          scrollbarWidth: 'none',
+          paddingTop: 64,
+          paddingBottom: 80,
         }}
       >
         <Sidebar
@@ -70,13 +64,13 @@ export default function PortfolioLayout({ projects, contributions }: Props) {
         />
       </div>
 
-      {/* Scrollable right panel */}
+      {/* Scrollable right panel — hidden scrollbar */}
       <div
         ref={scrollRef}
         className="scroll-panel"
         style={{
           position: 'fixed',
-          left: 64 + 329 + 64, // 457px
+          left: 457, // 64 + 329 + 64
           right: 64,
           top: 0,
           bottom: 0,
