@@ -106,8 +106,7 @@ export const projects: Project[] = [
       'Instant transfers were one of the most requested features at Qonto, yet making them the default experience raised real product questions: who gets it, when, at what cost, and in what context. This project tackled both the strategic and UX challenges of rolling out instant SEPA transfers as the new norm, free and activated by default for all users, while preserving the classic transfer option and carefully measuring adoption to drive value for users and reduce customer support load.',
     images: [
       '/images/sepa-out-1.png',
-      '/images/sepa-out-2.png',
-      '/images/sepa-out-3.png',
+      ['/images/sepa-out-2.png', '/images/sepa-out-3.png'],
     ],
   },
   {
