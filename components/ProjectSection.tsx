@@ -10,12 +10,21 @@ interface Props {
 
 function ImageFrame({ src, alt }: { src: string; alt: string }) {
   return (
-    <div style={{ width: '100%', background: '#F6F6F6', borderRadius: 2, overflow: 'hidden' }}>
-      <img
-        src={src}
-        alt={alt}
-        style={{ width: '100%', height: 'auto', display: 'block' }}
-      />
+    <div style={{ background: '#F6F6F6', borderRadius: 2, overflow: 'hidden', width: '100%' }}>
+      <img src={src} alt={alt} style={{ width: '100%', height: 'auto', display: 'block' }} />
+    </div>
+  )
+}
+
+function ImagePair({ srcs, alts }: { srcs: [string, string]; alts: [string, string] }) {
+  return (
+    <div style={{ display: 'flex', gap: 12, width: '100%' }}>
+      <div style={{ flex: 1, background: '#F6F6F6', borderRadius: 2, overflow: 'hidden' }}>
+        <img src={srcs[0]} alt={alts[0]} style={{ width: '100%', height: 'auto', display: 'block' }} />
+      </div>
+      <div style={{ flex: 1, background: '#F6F6F6', borderRadius: 2, overflow: 'hidden' }}>
+        <img src={srcs[1]} alt={alts[1]} style={{ width: '100%', height: 'auto', display: 'block' }} />
+      </div>
     </div>
   )
 }
@@ -30,6 +39,7 @@ export default function ProjectSection({ project, index }: Props) {
       transition={{ duration: 0.22, ease: 'easeOut' }}
       style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
     >
+      {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
           <div
@@ -56,9 +66,19 @@ export default function ProjectSection({ project, index }: Props) {
           </p>
         )}
       </div>
-      {project.images.map((src, i) => (
-        <ImageFrame key={i} src={src} alt={`${project.title} — ${i + 1}`} />
-      ))}
+
+      {/* Images — supports single or [pair] */}
+      {project.images.map((row, i) =>
+        Array.isArray(row) ? (
+          <ImagePair
+            key={i}
+            srcs={row as [string, string]}
+            alts={[`${project.title} — ${i + 1}a`, `${project.title} — ${i + 1}b`]}
+          />
+        ) : (
+          <ImageFrame key={i} src={row} alt={`${project.title} — ${i + 1}`} />
+        )
+      )}
     </motion.div>
   )
 }
