@@ -14,18 +14,18 @@ const IMAGES = ['/images/dashboard.jpg', '/images/dashboard.jpg', '/images/dashb
 
 export const projects: Project[] = [
   {
-    slug: 'dashboards-organisation',
-    title: 'Dashboards organisation',
-    company: 'Sweep',
-    year: '2026',
-    description: LOREM,
-    images: IMAGES,
-  },
-  {
     slug: 'access-rights',
     title: 'Access Rights',
     company: 'Sweep',
     year: '2025',
+    description: LOREM,
+    images: IMAGES,
+  },
+  {
+    slug: 'dashboards-organisation',
+    title: 'Dashboards organisation',
+    company: 'Sweep',
+    year: '2026',
     description: LOREM,
     images: IMAGES,
   },

@@ -6,6 +6,8 @@ import AllProjects from './AllProjects'
 import type { Project } from '@/data/projects'
 import type { ContributionDay } from '@/types/github'
 
+const ANCHOR_OFFSET = 40 // px above project title
+
 interface Props {
   projects: Project[]
   contributions: ContributionDay[] | null
@@ -17,8 +19,15 @@ export default function PortfolioLayout({ projects, contributions }: Props) {
 
   const scrollTo = useCallback((slug: string) => {
     const el = document.getElementById(slug)
-    if (!el) return
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    const container = scrollRef.current
+    if (!el || !container) return
+
+    // Position relative to scroll container, minus offset
+    const containerRect = container.getBoundingClientRect()
+    const elRect = el.getBoundingClientRect()
+    const target = elRect.top - containerRect.top + container.scrollTop - ANCHOR_OFFSET
+
+    container.scrollTo({ top: target, behavior: 'smooth' })
   }, [])
 
   useEffect(() => {
@@ -44,7 +53,6 @@ export default function PortfolioLayout({ projects, contributions }: Props) {
 
   return (
     <>
-      {/* Fixed left panel — full height, 80px padding bottom for graph */}
       <div
         style={{
           position: 'fixed',
@@ -64,13 +72,12 @@ export default function PortfolioLayout({ projects, contributions }: Props) {
         />
       </div>
 
-      {/* Scrollable right panel — hidden scrollbar */}
       <div
         ref={scrollRef}
         className="scroll-panel"
         style={{
           position: 'fixed',
-          left: 457, // 64 + 329 + 64
+          left: 457,
           right: 64,
           top: 0,
           bottom: 0,
