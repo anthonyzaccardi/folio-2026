@@ -76,6 +76,20 @@ export const projects: Project[] = [
       '/images/dashboards-exploration-3.jpg',
     ],
   },
+
+  {
+    slug: 'post-generator',
+    title: 'Post Generator',
+    company: 'Personal',
+    year: '2026',
+    description:
+      'A web app that takes any blog article — pasted text or a URL — and turns it into social media posts in different tones: punchy, educational, storytelling. Includes a full dashboard with analytics, copy tracking, generation history, and a Raycast extension for native access at zero cost.',
+    images: [
+      '/images/tweet-generator-1.png',
+      '/images/tweet-generator-2.png',
+      '/images/tweet-generator-3.png',
+    ],
+  },
   {
     slug: 'sepa-instant-out',
     title: 'SEPA Instant Out',
