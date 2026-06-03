@@ -51,9 +51,9 @@ export default function Sidebar({ projects, activeSlug, onSelect, contributions 
       >
         {/* Name + title */}
         <div style={{ height: 42 }}>
-          <p style={{ fontSize: 14, fontWeight: 500, lineHeight: '20px', color: '#000' }}>
+          <button onClick={() => onSelect(projects[0].slug)} style={{ fontSize: 14, fontWeight: 500, lineHeight: '20px', color: '#000', background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left' }}>
             <AnimatedName />
-          </p>
+          </button>
           <p style={{ fontSize: 14, lineHeight: '20px', color: '#6E6E6E' }}>Product Designer</p>
         </div>
 
