@@ -7,23 +7,11 @@ import type { ContributionDay } from '@/types/github'
 
 function AnimatedName() {
   const [hov, setHov] = useState(false)
-  // Letters that stay BLACK on hover → spell "tonyz.cc"
-  // A(0) n(1) t(2) h(3) o(4) n(5) y(6) _(7) Z(8) a(9) c(10) c(11) a(12) r(13) d(14) i(15)
   const BLACK_IDX = new Set([2, 4, 5, 6, 8, 10, 11])
   return (
-    <span
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{ cursor: 'default' }}
-    >
+    <span onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)} style={{ cursor: 'default' }}>
       {'Anthony Zaccardi'.split('').map((char, i) => (
-        <span
-          key={i}
-          style={{
-            color: !hov || char === ' ' ? '#000' : BLACK_IDX.has(i) ? '#000' : '#BDBDBD',
-            transition: 'color 0.15s ease',
-          }}
-        >
+        <span key={i} style={{ color: !hov || char === ' ' ? '#000' : BLACK_IDX.has(i) ? '#000' : '#BDBDBD', transition: 'color 0.15s ease' }}>
           {char}
         </span>
       ))}
@@ -54,18 +42,12 @@ interface Props {
 }
 
 export default function Sidebar({ projects, activeSlug, onSelect, contributions }: Props) {
-
   return (
     <aside style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      {/* sidebar-inner: scrollable on desktop, static on mobile */}
       <div
-        style={{
-          flex: 1,
-          overflowY: 'auto',
-          scrollbarWidth: 'none',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 32,
-        }}
+        className="sidebar-inner"
+        style={{ flex: 1, overflowY: 'auto', scrollbarWidth: 'none', display: 'flex', flexDirection: 'column', gap: 32 }}
       >
         {/* Name + title */}
         <div style={{ height: 42 }}>
@@ -77,9 +59,7 @@ export default function Sidebar({ projects, activeSlug, onSelect, contributions 
 
         {/* Bio */}
         <div style={{ fontSize: 14, lineHeight: '20px', color: '#6E6E6E' }}>
-          <p style={{ fontSize: 12, lineHeight: '18px', color: '#BDBDBD', marginBottom: 4 }}>
-            /. me, myself &amp; I
-          </p>
+          <p style={{ fontSize: 12, lineHeight: '18px', color: '#BDBDBD', marginBottom: 4 }}>/. me, myself &amp; I</p>
           <p>
             {'Currently Product Design Manager at '}
             <NavLink href="https://sweep.net/">Sweep</NavLink>
@@ -89,17 +69,12 @@ export default function Sidebar({ projects, activeSlug, onSelect, contributions 
             <NavLink href="https://qonto.com/fr">Qonto</NavLink>.
           </p>
           <br />
-          <p>
-            I design products that make complex things feel simple. My work sits at the intersection
-            of product strategy, systems thinking and interaction design.
-          </p>
+          <p>I design products that make complex things feel simple. My work sits at the intersection of product strategy, systems thinking and interaction design.</p>
           <br />
           <p>
-            Lately, I&apos;ve been obsessed with AI-powered workflows, rapid prototyping and finding
-            better ways to make decisions.
+            Lately, I&apos;ve been obsessed with AI-powered workflows, rapid prototyping and finding better ways to make decisions.
             <br />
-            Occasionally, I build things that probably shouldn&apos;t exist just to see what
-            happens.
+            Occasionally, I build things that probably shouldn&apos;t exist just to see what happens.
           </p>
           <br />
           <p>
@@ -112,8 +87,8 @@ export default function Sidebar({ projects, activeSlug, onSelect, contributions 
           </p>
         </div>
 
-        {/* Project list */}
-        <div style={{ fontSize: 14 }}>
+        {/* Project list — hidden on mobile */}
+        <div className="hide-mobile" style={{ fontSize: 14 }}>
           <p style={{ fontSize: 12, lineHeight: '18px', color: '#BDBDBD', marginBottom: 4 }}>
             {'//. projects'}
           </p>
@@ -122,37 +97,23 @@ export default function Sidebar({ projects, activeSlug, onSelect, contributions 
               key={p.slug}
               onClick={() => onSelect(p.slug)}
               style={{
-                display: 'block',
-                width: '100%',
-                textAlign: 'left',
-                background: 'none',
-                border: 'none',
-                padding: 0,
-                cursor: 'pointer',
-                lineHeight: '24px',
-                fontSize: 14,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
+                display: 'block', width: '100%', textAlign: 'left',
+                background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+                lineHeight: '24px', fontSize: 14, whiteSpace: 'nowrap', overflow: 'hidden',
               }}
             >
               {p.slug === activeSlug ? (
-                <>
-                  <span style={{ fontWeight: 500, color: '#000' }}>→ {p.title}</span>
-                  <span style={{ color: '#BDBDBD' }}> [{p.company}]</span>
-                </>
+                <><span style={{ fontWeight: 500, color: '#000' }}>→ {p.title}</span><span style={{ color: '#BDBDBD' }}> [{p.company}]</span></>
               ) : (
-                <>
-                  <span style={{ color: '#6E6E6E' }}>{p.title}</span>
-                  <span style={{ color: '#BDBDBD' }}> [{p.company}]</span>
-                </>
+                <><span style={{ color: '#6E6E6E' }}>{p.title}</span><span style={{ color: '#BDBDBD' }}> [{p.company}]</span></>
               )}
             </button>
           ))}
         </div>
       </div>
 
-      {/* GitHub graph — pinned to bottom */}
-      <div style={{ flexShrink: 0, paddingTop: 24 }}>
+      {/* GitHub graph — hidden on mobile */}
+      <div className="hide-mobile" style={{ flexShrink: 0, paddingTop: 24 }}>
         <GitHubGraph contributions={contributions} />
       </div>
     </aside>

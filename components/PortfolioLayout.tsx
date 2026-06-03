@@ -6,7 +6,7 @@ import AllProjects from './AllProjects'
 import type { Project } from '@/data/projects'
 import type { ContributionDay } from '@/types/github'
 
-const ANCHOR_OFFSET = 40 // px above project title
+const ANCHOR_OFFSET = 40
 
 interface Props {
   projects: Project[]
@@ -21,19 +21,15 @@ export default function PortfolioLayout({ projects, contributions }: Props) {
     const el = document.getElementById(slug)
     const container = scrollRef.current
     if (!el || !container) return
-
-    // Position relative to scroll container, minus offset
     const containerRect = container.getBoundingClientRect()
     const elRect = el.getBoundingClientRect()
     const target = elRect.top - containerRect.top + container.scrollTop - ANCHOR_OFFSET
-
     container.scrollTo({ top: target, behavior: 'smooth' })
   }, [])
 
   useEffect(() => {
     const container = scrollRef.current
     if (!container) return
-
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -42,18 +38,18 @@ export default function PortfolioLayout({ projects, contributions }: Props) {
       },
       { root: container, threshold: 0, rootMargin: '0px 0px -65% 0px' }
     )
-
     projects.forEach((p) => {
       const el = document.getElementById(p.slug)
       if (el) observer.observe(el)
     })
-
     return () => observer.disconnect()
   }, [projects])
 
   return (
     <>
+      {/* Left panel — fixed on desktop, static on mobile via CSS */}
       <div
+        className="panel-left"
         style={{
           position: 'fixed',
           left: 64,
@@ -72,9 +68,10 @@ export default function PortfolioLayout({ projects, contributions }: Props) {
         />
       </div>
 
+      {/* Right panel — fixed scroll on desktop, static on mobile via CSS */}
       <div
         ref={scrollRef}
-        className="scroll-panel"
+        className="panel-right scroll-panel"
         style={{
           position: 'fixed',
           left: 457,

@@ -28,25 +28,64 @@ body {
   background: #fff;
 }
 
-/* Hide scrollbar on scroll panel but keep scroll functionality */
-.scroll-panel::-webkit-scrollbar {
-  display: none;
-}
-.scroll-panel {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+/* Hide scrollbar on scroll panel */
+.scroll-panel::-webkit-scrollbar { display: none; }
+.scroll-panel { scrollbar-width: none; -ms-overflow-style: none; }
+
+::selection { background: #000; color: #fff; }
+a { color: inherit; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ─── Mobile ─────────────────────────────────────────── */
+@media (max-width: 768px) {
+  html, body {
+    overflow: visible !important;
+    height: auto !important;
+    min-width: 0 !important;
+  }
+
+  /* Left panel: static, full width, mobile padding */
+  .panel-left {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    padding: 48px 24px 0 !important;
+  }
+
+  /* Sidebar inner: undo flex-1 / overflow-y */
+  .sidebar-inner {
+    flex: none !important;
+    overflow-y: visible !important;
+    height: auto !important;
+  }
+
+  /* Right panel: static, normal page scroll */
+  .panel-right {
+    position: static !important;
+    left: unset !important;
+    right: unset !important;
+    top: unset !important;
+    bottom: unset !important;
+    height: auto !important;
+    overflow-y: visible !important;
+    padding: 32px 24px 80px !important;
+  }
+
+  /* Hide project list + GitHub graph on mobile */
+  .hide-mobile {
+    display: none !important;
+  }
 }
 
-::selection {
-  background: #000;
-  color: #fff;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
+/* Project header: stack on mobile */
+@media (max-width: 768px) {
+  .project-header {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  .project-header p {
+    max-width: none !important;
+    flex: none !important;
+  }
 }

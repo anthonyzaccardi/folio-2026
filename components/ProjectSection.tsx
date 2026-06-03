@@ -40,7 +40,7 @@ export default function ProjectSection({ project, index }: Props) {
       style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
     >
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 24 }}>
+      <div className="project-header" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
           <div
             style={{
