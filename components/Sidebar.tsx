@@ -2,16 +2,15 @@
 
 import { useState } from 'react'
 import GitHubGraph from './GitHubGraph'
+import { useClickSound } from '@/hooks/useClickSound'
 import type { Project } from '@/data/projects'
 import type { ContributionDay } from '@/types/github'
 
-// On hover, only t,o,n,y,Z,c,c stay black → hidden "tonyz.cc" easter egg
 function AnimatedName() {
   const [hov, setHov] = useState(false)
-  // Indices in "Anthony Zaccardi" that stay BLACK
-  // A(0) n(1) t(2) h(3) o(4) n(5) y(6)   Z(8) a(9) c(10) c(11) a(12) r(13) d(14) i(15)
+  // Letters that stay BLACK on hover → spell "tonyz.cc"
+  // A(0) n(1) t(2) h(3) o(4) n(5) y(6) _(7) Z(8) a(9) c(10) c(11) a(12) r(13) d(14) i(15)
   const BLACK_IDX = new Set([2, 4, 5, 6, 8, 10, 11])
-
   return (
     <span
       onMouseEnter={() => setHov(true)}
@@ -33,16 +32,7 @@ function AnimatedName() {
   )
 }
 
-// Link that goes gray on hover
-function NavLink({
-  href,
-  children,
-  mail = false,
-}: {
-  href: string
-  children: React.ReactNode
-  mail?: boolean
-}) {
+function NavLink({ href, children, mail = false }: { href: string; children: React.ReactNode; mail?: boolean }) {
   const [hov, setHov] = useState(false)
   return (
     <a
@@ -50,11 +40,7 @@ function NavLink({
       {...(!mail ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
-      style={{
-        color: hov ? '#BDBDBD' : '#000',
-        transition: 'color 0.15s ease',
-        textDecoration: 'none',
-      }}
+      style={{ color: hov ? '#BDBDBD' : '#000', transition: 'color 0.15s ease', textDecoration: 'none' }}
     >
       {children}
     </a>
@@ -69,15 +55,15 @@ interface Props {
 }
 
 export default function Sidebar({ projects, activeSlug, onSelect, contributions }: Props) {
+  const playClick = useClickSound()
+
   return (
     <aside style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      {/* Scrollable content */}
       <div
         style={{
           flex: 1,
           overflowY: 'auto',
           scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
           display: 'flex',
           flexDirection: 'column',
           gap: 32,
@@ -102,8 +88,7 @@ export default function Sidebar({ projects, activeSlug, onSelect, contributions 
             {'. Previously '}
             <NavLink href="https://www.pennylane.com/fr">Pennylane</NavLink>
             {' & '}
-            <NavLink href="https://qonto.com/fr">Qonto</NavLink>
-            .
+            <NavLink href="https://qonto.com/fr">Qonto</NavLink>.
           </p>
           <br />
           <p>
@@ -121,9 +106,7 @@ export default function Sidebar({ projects, activeSlug, onSelect, contributions 
           <br />
           <p>
             {'Reach me by '}
-            <NavLink href="mailto:zaccardi.anthony@gmail.com" mail>
-              mail
-            </NavLink>
+            <NavLink href="mailto:zaccardi.anthony@gmail.com" mail>mail</NavLink>
             {' or dm on '}
             <NavLink href="https://x.com/anthonyzaccardi">x.com</NavLink>
             <span style={{ color: '#6E6E6E' }}> / </span>
@@ -139,7 +122,7 @@ export default function Sidebar({ projects, activeSlug, onSelect, contributions 
           {projects.map((p) => (
             <button
               key={p.slug}
-              onClick={() => onSelect(p.slug)}
+              onClick={() => { playClick(); onSelect(p.slug) }}
               style={{
                 display: 'block',
                 width: '100%',
