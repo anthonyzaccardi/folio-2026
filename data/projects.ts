@@ -81,7 +81,7 @@ export const projects: Project[] = [
     title: 'SEPA Instant Out',
     company: 'Qonto',
     year: '2022',
-    description: LOREM,
+    description: 'Instant transfers were one of the most requested features at Qonto, yet making them the default experience raised real product questions: who gets it, when, at what cost, and in what context. This project tackled both the strategic and UX challenges of rolling out instant SEPA transfers as the new norm, free and activated by default for all users, while preserving the classic transfer option and carefully measuring adoption to drive value for users and reduce customer support load.',
     images: ['/images/dashboard.jpg', '/images/dashboard.jpg', '/images/dashboard.jpg'],
   },
   {
@@ -89,7 +89,7 @@ export const projects: Project[] = [
     title: 'Transfers redesign',
     company: 'Qonto',
     year: '2022',
-    description: LOREM,
+    description: 'The transfer flow had not evolved in years, and users were making recurring mistakes that generated significant customer support volume. This project redesigned the experience from the ground up, with a clearer separation between mandatory and optional fields, smarter pre-filling, and real-time field validation, turning a friction-heavy form into a faster, more intuitive flow that prevents errors before they happen.',
     images: ['/images/dashboard.jpg', '/images/dashboard.jpg', '/images/dashboard.jpg'],
   },
 ]
