@@ -51,7 +51,7 @@ export default function ProjectSection({ project, index }: Props) {
           </div>
         </div>
         {project.description && (
-          <p style={{ fontSize: 14, lineHeight: '20px', color: '#BDBDBD', flex: 1, maxWidth: 624 }}>
+          <p style={{ fontSize: 14, lineHeight: '20px', color: '#6E6E6E', flex: 1, maxWidth: 624 }}>
             {project.description}
           </p>
         )}
