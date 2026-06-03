@@ -115,7 +115,7 @@ export default function Sidebar({ projects, activeSlug, onSelect, contributions 
         {/* Project list */}
         <div style={{ fontSize: 14 }}>
           <p style={{ fontSize: 12, lineHeight: '18px', color: '#BDBDBD', marginBottom: 4 }}>
-            //. projects
+            {'//. projects'}
           </p>
           {projects.map((p) => (
             <button
