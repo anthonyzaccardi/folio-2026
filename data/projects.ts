@@ -113,11 +113,16 @@ export const projects: Project[] = [
     images: ['/images/dashboard.jpg', '/images/dashboard.jpg', '/images/dashboard.jpg'],
   },
   {
-    slug: 'transfers-redesign',
-    title: 'Transfers redesign',
+    slug: 'gbr-germany',
+    title: 'GBR Germany',
     company: 'Qonto',
     year: '2022',
-    description: 'The transfer flow had not evolved in years, and users were making recurring mistakes that generated significant customer support volume. This project redesigned the experience from the ground up, with a clearer separation between mandatory and optional fields, smarter pre-filling, and real-time field validation, turning a friction-heavy form into a faster, more intuitive flow that prevents errors before they happen.',
-    images: ['/images/dashboard.jpg', '/images/dashboard.jpg', '/images/dashboard.jpg'],
+    description:
+      'Qonto was expanding into Germany with support for GbR businesses — a legal partnership entity with unique KYB requirements and a tight 3–4 week development window. This project delivered a dedicated onboarding flow for GbR accounts, adapted from existing flows to meet German regulatory constraints and drive early KYB validation at scale.',
+    images: [
+      '/images/gbr-germany-1.png',
+      '/images/gbr-germany-2.png',
+      '/images/gbr-germany-3.png',
+    ],
   },
 ]
