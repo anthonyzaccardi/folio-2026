@@ -15,7 +15,7 @@ export const projects: Project[] = [
     slug: 'access-rights',
     title: 'Access Rights',
     company: 'Sweep',
-    year: '2025',
+    year: '2026',
     description:
       'Transition planning involves multiple stakeholders with varying levels of ownership and visibility. This project defines a permission model for the Act module, ensuring the right people have the right access, without compromising collaboration or data integrity.',
     images: [
@@ -41,7 +41,7 @@ export const projects: Project[] = [
     slug: 'actions-library',
     title: 'Actions library',
     company: 'Sweep',
-    year: '2025',
+    year: '2026',
     description:
       'Recurring actions shouldn\'t be rebuilt from scratch every time. This project explores a centralized library of reusable actions, helping teams standardize their processes, reduce manual effort, and maintain consistency across transition plans.',
     images: [
@@ -54,7 +54,7 @@ export const projects: Project[] = [
     slug: 'act-vision-2',
     title: 'Act vision 2.0',
     company: 'Sweep',
-    year: '2024',
+    year: '2025',
     description:
       'The Act module needed a north star. This project reframes the long-term product direction for transition planning, aligning business goals, user needs, and technical constraints into a coherent vision that guides prioritization and future design decisions.',
     images: [
@@ -67,7 +67,7 @@ export const projects: Project[] = [
     slug: 'dashboards-exploration',
     title: 'Dashboards exploration',
     company: 'Sweep',
-    year: '2024',
+    year: '2025',
     description:
       'Before defining what dashboards should become, we needed to understand how users actually interact with data today. This exploratory project surfaces key insights around usage patterns, mental models, and unmet needs, laying the foundation for a more intentional dashboard experience.',
     images: [
@@ -78,10 +78,24 @@ export const projects: Project[] = [
   },
 
   {
+    slug: 'design-planning',
+    title: 'Design Planning',
+    company: 'Personal',
+    year: '2026',
+    description:
+      'A Gantt timeline tool built for design teams, with no third-party software required. Full timeline with Day / Week / Month views, drag-and-drop phases and milestones, workload dashboard, OOO management, activity log, and real-time collaborative editing — all hosted on GitHub Pages.',
+    images: [
+      '/images/designers-sweep-1.png',
+      '/images/designers-sweep-2.png',
+      '/images/designers-sweep-3.png',
+    ],
+  },
+
+  {
     slug: 'post-generator',
     title: 'Post Generator',
     company: 'Personal',
-    year: '2026',
+    year: '2025',
     description:
       'A web app that takes any blog article — pasted text or a URL — and turns it into social media posts in different tones: punchy, educational, storytelling. Includes a full dashboard with analytics, copy tracking, generation history, and a Raycast extension for native access at zero cost.',
     images: [
