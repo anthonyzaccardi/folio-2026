@@ -62,7 +62,7 @@ export default function ProjectSection({ project, index }: Props) {
 
       {/* Description — below title, 16px margins */}
       {project.description && (
-        <p style={{ fontSize: 14, lineHeight: '20px', color: 'var(--c-text-2)', marginTop: 16, marginBottom: 16 }}>
+        <p style={{ fontSize: 14, lineHeight: '20px', color: 'var(--c-text-2)', marginTop: 16, marginBottom: 16, maxWidth: 526 }}>
           {project.description}
         </p>
       )}

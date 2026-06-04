@@ -10,7 +10,7 @@ const FALLBACK_COUNTS = [
 ]
 
 const BAR_W = 4
-const BAR_GAP = 2
+const BAR_GAP = 1
 const H = 24
 const LEVEL_OPACITY = [0.06, 0.25, 0.45, 0.65, 1]
 
