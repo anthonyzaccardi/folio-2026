@@ -70,3 +70,13 @@ a:hover { text-decoration: underline; }
   .project-header { flex-direction: column !important; gap: 8px !important; }
   .project-header p { max-width: none !important; flex: none !important; }
 }
+
+/* Arrow slide-in animation */
+@keyframes arrowSlide {
+  from { transform: translateX(-6px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+.arrow-animate {
+  display: inline-block;
+  animation: arrowSlide 0.22s ease-out forwards;
+}

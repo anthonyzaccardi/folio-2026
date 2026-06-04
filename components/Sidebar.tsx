@@ -72,9 +72,7 @@ export default function Sidebar({ projects, activeSlug, onSelect, contributions 
             <NavLink href="https://qonto.com/fr">Qonto</NavLink>.
           </p>
           <br />
-          <p>I design products that make complex things feel simple. My work sits at the intersection of product strategy, systems thinking and interaction design.</p>
-          <br />
-          <p>Lately, I&apos;ve been obsessed with AI-powered workflows, rapid prototyping and finding better ways to make decisions.<br />Occasionally, I build things that probably shouldn&apos;t exist just to see what happens.</p>
+          <p>I design products that make complex things feel simple — at the intersection of strategy, systems thinking, and interaction design. I build fast, think in systems, and occasionally make things that probably shouldn&apos;t exist.</p>
           <br />
           <p>
             {'Reach me by '}
@@ -93,7 +91,7 @@ export default function Sidebar({ projects, activeSlug, onSelect, contributions 
             <button key={p.slug} onClick={() => onSelect(p.slug)}
               style={{ display: 'block', width: '100%', textAlign: 'left', background: 'none', border: 'none', padding: 0, cursor: 'pointer', lineHeight: '24px', fontSize: 14, whiteSpace: 'nowrap', overflow: 'hidden' }}>
               {p.slug === activeSlug ? (
-                <><span style={{ fontWeight: 500, color: 'var(--c-text-1)' }}>→ {p.title}</span><span style={{ color: 'var(--c-text-3)' }}> [{p.company}]</span></>
+                <><span key={`a-${activeSlug}`} className="arrow-animate" style={{ fontWeight: 500, color: 'var(--c-text-1)', display: 'inline-block' }}>→ </span><span style={{ fontWeight: 500, color: 'var(--c-text-1)' }}>{p.title}</span><span style={{ color: 'var(--c-text-3)' }}> [{p.company}]</span></>
               ) : (
                 <><span style={{ color: 'var(--c-text-2)' }}>{p.title}</span><span style={{ color: 'var(--c-text-3)' }}> [{p.company}]</span></>
               )}

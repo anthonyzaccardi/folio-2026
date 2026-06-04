@@ -21,6 +21,7 @@ export const projects: Project[] = [
       '/images/access-rights-3.jpg',
     ],
   },
+
   {
     slug: 'dashboards-organisation',
     title: 'Dashboards organisation',
@@ -34,6 +35,7 @@ export const projects: Project[] = [
       '/images/dashboards-organisation-3.jpg',
     ],
   },
+
   {
     slug: 'actions-library',
     title: 'Actions library',
@@ -47,6 +49,7 @@ export const projects: Project[] = [
       '/images/actions-library-3.jpg',
     ],
   },
+
   {
     slug: 'act-vision-2',
     title: 'Act vision 2.0',
@@ -60,6 +63,7 @@ export const projects: Project[] = [
       '/images/act-vision-3.jpg',
     ],
   },
+
   {
     slug: 'dashboards-exploration',
     title: 'Dashboards exploration',
@@ -73,30 +77,7 @@ export const projects: Project[] = [
       '/images/dashboards-exploration-3.jpg',
     ],
   },
-  {
-    slug: 'design-planning',
-    title: 'Design Planning',
-    company: 'Personal',
-    year: '2026',
-    description:
-      'A Gantt timeline tool built for design teams, with no third-party software required. Full timeline with Day / Week / Month views, drag-and-drop phases and milestones, workload dashboard, OOO management, activity log, and real-time collaborative editing — all hosted on GitHub Pages.',
-    images: [
-      '/images/designers-sweep-1.png',
-      '/images/designers-sweep-2.png',
-    ],
-  },
-  {
-    slug: 'post-generator',
-    title: 'Post Generator',
-    company: 'Personal',
-    year: '2025',
-    description:
-      'A web app that takes any blog article — pasted text or a URL — and turns it into social media posts in different tones: punchy, educational, storytelling. Includes a full dashboard with analytics, copy tracking, generation history, and a Raycast extension for native access at zero cost.',
-    images: [
-      '/images/tweet-generator-1.png',
-      ['/images/tweet-generator-2.png', '/images/tweet-generator-3.png'],
-    ],
-  },
+
   {
     slug: 'sepa-instant-out',
     title: 'SEPA Instant Out',
@@ -109,6 +90,7 @@ export const projects: Project[] = [
       ['/images/sepa-out-2.png', '/images/sepa-out-3.png'],
     ],
   },
+
   {
     slug: 'gbr-germany',
     title: 'GBR Germany',
@@ -121,4 +103,31 @@ export const projects: Project[] = [
       ['/images/gbr-germany-2.png', '/images/gbr-germany-3.png'],
     ],
   },
+
+  {
+    slug: 'design-planning',
+    title: 'Design Planning',
+    company: 'Personal',
+    year: '2026',
+    description:
+      'A Gantt timeline tool built for design teams, with no third-party software required. Full timeline with Day / Week / Month views, drag-and-drop phases and milestones, workload dashboard, OOO management, activity log, and real-time collaborative editing — all hosted on GitHub Pages.',
+    images: [
+      '/images/designers-sweep-1.png',
+      '/images/designers-sweep-2.png',
+    ],
+  },
+
+  {
+    slug: 'post-generator',
+    title: 'Post Generator',
+    company: 'Personal',
+    year: '2025',
+    description:
+      'A web app that takes any blog article — pasted text or a URL — and turns it into social media posts in different tones: punchy, educational, storytelling. Includes a full dashboard with analytics, copy tracking, generation history, and a Raycast extension for native access at zero cost.',
+    images: [
+      '/images/tweet-generator-1.png',
+      ['/images/tweet-generator-2.png', '/images/tweet-generator-3.png'],
+    ],
+  },
+
 ]
