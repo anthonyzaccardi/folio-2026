@@ -9,7 +9,7 @@ function AnimatedName() {
   const [hov, setHov] = useState(false)
   const BLACK_IDX = new Set([2, 4, 5, 6, 8, 10, 11])
   return (
-    <span onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)} style={{ cursor: 'default' }}>
+    <span onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)} style={{ cursor: 'pointer' }}>
       {'Anthony Zaccardi'.split('').map((char, i) => (
         <span key={i} style={{ color: !hov || char === ' ' ? '#000' : BLACK_IDX.has(i) ? '#000' : '#BDBDBD', transition: 'color 0.15s ease' }}>
           {char}
