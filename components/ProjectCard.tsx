@@ -62,7 +62,16 @@ export default function ProjectCard({ project, index }: Props) {
       </div>
 
       {/* Carousel */}
-      <ImageCarousel images={project.images} alt={project.title} />
+      <ImageCarousel
+        images={project.images}
+        alt={project.title}
+        projectInfo={{
+          title: project.title,
+          company: project.company,
+          year: project.year,
+          description: project.description,
+        }}
+      />
     </div>
   )
 }

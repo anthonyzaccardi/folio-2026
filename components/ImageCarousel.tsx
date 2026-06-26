@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom'
 
 type Zone = 'left' | 'middle' | 'right'
 interface Rect { x: number; y: number; width: number; height: number }
+interface ProjectInfo { title: string; company: string; year: string; description: string }
 
 // ─── Cursor helpers ───────────────────────────────────────────────────────────
 
@@ -57,23 +58,23 @@ interface ModalProps {
   images: string[]
   startIdx: number
   isDark: boolean
-  originRect: Rect                        // thumbnail rect at open time (for open FLIP)
-  getOriginRect: () => DOMRect | null     // live measurement for close FLIP
-  onClose: (finalIdx: number) => void     // passes back current image index
+  originRect: Rect
+  getOriginRect: () => DOMRect | null
+  projectInfo: ProjectInfo
+  onClose: (finalIdx: number) => void
 }
 
-function Modal({ images, startIdx, isDark, originRect, getOriginRect, onClose }: ModalProps) {
+function Modal({ images, startIdx, isDark, originRect, getOriginRect, projectInfo, onClose }: ModalProps) {
   const [idx, setIdx] = useState(startIdx)
   const [phase, setPhase] = useState<Phase>('hidden')
   const [flipTransform, setFlipTransform] = useState('')
   const [closing, setClosing] = useState(false)
   const [backdropVisible, setBackdropVisible] = useState(false)
   const [isLeft, setIsLeft] = useState(false)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const imgRef = useRef<HTMLDivElement>(null)
 
-  // Compute FLIP from modal image → target rect
   const computeFlipTo = useCallback((target: Rect) => {
-    const el = containerRef.current
+    const el = imgRef.current
     if (!el) return null
     const r = el.getBoundingClientRect()
     if (!r.width) return null
@@ -83,7 +84,6 @@ function Modal({ images, startIdx, isDark, originRect, getOriginRect, onClose }:
     return `translate(${dx}px, ${dy}px) scale(${scale})`
   }, [])
 
-  // Open: snap image to thumbnail, then animate to center
   const runOpenFlip = useCallback(() => {
     const t = computeFlipTo(originRect)
     if (!t) return
@@ -100,11 +100,10 @@ function Modal({ images, startIdx, isDark, originRect, getOriginRect, onClose }:
 
   useLayoutEffect(() => {
     runOpenFlip()
-    const img = containerRef.current?.querySelector('img') as HTMLImageElement | null
+    const img = imgRef.current?.querySelector('img') as HTMLImageElement | null
     if (img && !img.complete) img.addEventListener('load', runOpenFlip, { once: true })
   }, [runOpenFlip])
 
-  // Close: FLIP image back to thumbnail (fresh measurement), sync index
   const close = useCallback(() => {
     if (closing) return
     setClosing(true)
@@ -116,7 +115,6 @@ function Modal({ images, startIdx, isDark, originRect, getOriginRect, onClose }:
     const t = fresh ? computeFlipTo(fresh) : null
     if (t) {
       setFlipTransform(t)
-      // phase stays 'play' → transition is active → image glides back
       setTimeout(() => onClose(idx), 420)
     } else {
       onClose(idx)
@@ -130,7 +128,7 @@ function Modal({ images, startIdx, isDark, originRect, getOriginRect, onClose }:
   }, [close])
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = containerRef.current?.getBoundingClientRect()
+    const rect = imgRef.current?.getBoundingClientRect()
     if (!rect) return
     setIsLeft(e.clientX - rect.left < rect.width / 2)
   }, [])
@@ -138,7 +136,7 @@ function Modal({ images, startIdx, isDark, originRect, getOriginRect, onClose }:
   const handleImgClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation()
     if (images.length <= 1) return
-    const rect = containerRef.current?.getBoundingClientRect()
+    const rect = imgRef.current?.getBoundingClientRect()
     if (!rect) return
     const left = e.clientX - rect.left < rect.width / 2
     setIdx(i => left ? (i - 1 + images.length) % images.length : (i + 1) % images.length)
@@ -146,11 +144,8 @@ function Modal({ images, startIdx, isDark, originRect, getOriginRect, onClose }:
 
   const EASE = 'cubic-bezier(0.16, 1, 0.3, 1)'
   const bgColor = isDark ? 'rgba(10,10,10,0.56)' : 'rgba(255,255,255,0.56)'
-  const closeBtnBg = isDark ? 'rgba(40,40,40,0.9)' : 'rgba(240,240,240,0.9)'
-  const closeBtnColor = isDark ? '#ebebeb' : '#333333'
 
   return createPortal(
-    // Backdrop — X cursor outside the image
     <div
       onClick={close}
       style={{
@@ -177,7 +172,7 @@ function Modal({ images, startIdx, isDark, originRect, getOriginRect, onClose }:
           top: 24,
           right: 24,
           zIndex: 10000,
-          background: closeBtnBg,
+          background: isDark ? 'rgba(40,40,40,0.9)' : 'rgba(240,240,240,0.9)',
           border: 'none',
           borderRadius: '50%',
           width: 36,
@@ -187,42 +182,82 @@ function Modal({ images, startIdx, isDark, originRect, getOriginRect, onClose }:
           justifyContent: 'center',
           cursor: 'pointer',
           fontSize: 16,
-          color: closeBtnColor,
+          color: isDark ? '#ebebeb' : '#333333',
         }}
       >
         ✕
       </button>
 
-      {/* Image with FLIP transform */}
+      {/* 1 + 4 column grid */}
       <div
-        ref={containerRef}
-        onMouseMove={handleMouseMove}
-        onClick={handleImgClick}
+        onClick={(e) => e.stopPropagation()}
         style={{
-          transform: flipTransform || undefined,
-          transition: phase === 'play' ? `transform 0.45s ${EASE}` : 'none',
-          opacity: phase === 'hidden' ? 0 : 1,
-          transformOrigin: 'center center',
-          cursor: images.length > 1
-            ? makeArrowCursor(isLeft ? 'left' : 'right', isDark)
-            : 'default',
-          borderRadius: 4,
-          overflow: 'hidden',
-          flexShrink: 0,
+          display: 'grid',
+          gridTemplateColumns: '1fr 4fr',
+          gap: 16,
+          maxWidth: '90vw',
+          maxHeight: '90vh',
+          alignItems: 'stretch',
+          cursor: 'default',
         }}
       >
-        <img
-          src={images[idx]}
-          alt=""
+        {/* Description panel — white box */}
+        <div
           style={{
-            display: 'block',
-            maxWidth: '90vw',
-            maxHeight: '90vh',
-            width: 'auto',
-            height: 'auto',
-            objectFit: 'contain',
+            background: '#ffffff',
+            borderRadius: 8,
+            padding: 24,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 16,
+            overflowY: 'auto',
+            minWidth: 200,
           }}
-        />
+        >
+          <div>
+            <p style={{ fontSize: 13, fontWeight: 700, lineHeight: '20px', color: '#000000' }}>
+              {projectInfo.title}
+            </p>
+            <p style={{ fontSize: 12, lineHeight: '18px', color: '#BDBDBD', marginTop: 2 }}>
+              {projectInfo.company} / {projectInfo.year}
+            </p>
+          </div>
+          <p style={{ fontSize: 13, lineHeight: '20px', color: '#6E6E6E' }}>
+            {projectInfo.description}
+          </p>
+        </div>
+
+        {/* Image — FLIP target */}
+        <div
+          ref={imgRef}
+          onMouseMove={handleMouseMove}
+          onClick={handleImgClick}
+          style={{
+            transform: flipTransform || undefined,
+            transition: phase === 'play' ? `transform 0.45s ${EASE}` : 'none',
+            opacity: phase === 'hidden' ? 0 : 1,
+            transformOrigin: 'center center',
+            cursor: images.length > 1
+              ? makeArrowCursor(isLeft ? 'left' : 'right', isDark)
+              : 'default',
+            borderRadius: 8,
+            overflow: 'hidden',
+            flexShrink: 0,
+          }}
+        >
+          <img
+            src={images[idx]}
+            alt=""
+            style={{
+              display: 'block',
+              maxWidth: '100%',
+              maxHeight: '90vh',
+              width: 'auto',
+              height: 'auto',
+              objectFit: 'contain',
+            }}
+          />
+        </div>
       </div>
     </div>,
     document.body
@@ -234,9 +269,10 @@ function Modal({ images, startIdx, isDark, originRect, getOriginRect, onClose }:
 interface Props {
   images: (string | [string, string])[]
   alt: string
+  projectInfo?: ProjectInfo
 }
 
-export default function ImageCarousel({ images, alt }: Props) {
+export default function ImageCarousel({ images, alt, projectInfo }: Props) {
   const [idx, setIdx] = useState(0)
   const [zone, setZone] = useState<Zone>('middle')
   const [isDark, setIsDark] = useState(false)
@@ -245,8 +281,6 @@ export default function ImageCarousel({ images, alt }: Props) {
   const ref = useRef<HTMLDivElement>(null)
 
   const flat = images.flatMap(img => Array.isArray(img) ? img : [img])
-
-  // Live rect getter for close FLIP
   const getOriginRect = useCallback(() => ref.current?.getBoundingClientRect() ?? null, [])
 
   useEffect(() => {
@@ -279,7 +313,7 @@ export default function ImageCarousel({ images, alt }: Props) {
   }, [images.length])
 
   const handleModalClose = useCallback((finalIdx: number) => {
-    setIdx(finalIdx)   // sync carousel to image shown in modal
+    setIdx(finalIdx)
     setModalOpen(false)
   }, [])
 
@@ -313,13 +347,14 @@ export default function ImageCarousel({ images, alt }: Props) {
         )}
       </div>
 
-      {modalOpen && (
+      {modalOpen && projectInfo && (
         <Modal
           images={flat}
           startIdx={flat.indexOf(Array.isArray(current) ? current[0] : current)}
           isDark={isDark}
           originRect={originRect}
           getOriginRect={getOriginRect}
+          projectInfo={projectInfo}
           onClose={handleModalClose}
         />
       )}
