@@ -1,11 +1,11 @@
-import ProjectSection from './ProjectSection'
+import ProjectCard from './ProjectCard'
 import type { Project } from '@/data/projects'
 
 export default function AllProjects({ projects }: { projects: Project[] }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 64 }}>
+    <div className="project-grid">
       {projects.map((p, i) => (
-        <ProjectSection key={p.slug} project={p} index={i} />
+        <ProjectCard key={p.slug} project={p} index={i} />
       ))}
     </div>
   )

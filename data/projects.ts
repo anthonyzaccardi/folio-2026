@@ -87,7 +87,8 @@ export const projects: Project[] = [
       'Instant transfers were one of the most requested features at Qonto, yet making them the default experience raised real product questions: who gets it, when, at what cost, and in what context. This project tackled both the strategic and UX challenges of rolling out instant SEPA transfers as the new norm, free and activated by default for all users, while preserving the classic transfer option and carefully measuring adoption to drive value for users and reduce customer support load.',
     images: [
       '/images/sepa-out-1.png',
-      ['/images/sepa-out-2.png', '/images/sepa-out-3.png'],
+      '/images/sepa-out-2.png',
+      '/images/sepa-out-3.png',
     ],
   },
 
@@ -100,7 +101,8 @@ export const projects: Project[] = [
       'Qonto was expanding into Germany with support for GbR businesses — a legal partnership entity with unique KYB requirements and a tight 3–4 week development window. This project delivered a dedicated onboarding flow for GbR accounts, adapted from existing flows to meet German regulatory constraints and drive early KYB validation at scale.',
     images: [
       '/images/gbr-germany-1.png',
-      ['/images/gbr-germany-2.png', '/images/gbr-germany-3.png'],
+      '/images/gbr-germany-2.png',
+      '/images/gbr-germany-3.png',
     ],
   },
 
@@ -126,7 +128,8 @@ export const projects: Project[] = [
       'A web app that takes any blog article — pasted text or a URL — and turns it into social media posts in different tones: punchy, educational, storytelling. Includes a full dashboard with analytics, copy tracking, generation history, and a Raycast extension for native access at zero cost.',
     images: [
       '/images/tweet-generator-1.png',
-      ['/images/tweet-generator-2.png', '/images/tweet-generator-3.png'],
+      '/images/tweet-generator-2.png',
+      '/images/tweet-generator-3.png',
     ],
   },
 
