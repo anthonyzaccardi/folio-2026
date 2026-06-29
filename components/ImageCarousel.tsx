@@ -8,6 +8,7 @@ import { createPortal } from 'react-dom'
 type Zone = 'left' | 'middle' | 'right'
 interface Rect { x: number; y: number; width: number; height: number }
 interface ProjectInfo { title: string; company: string; year: string; description: string }
+type Phase = 'hidden' | 'snap' | 'play'
 
 // ─── Cursor helpers ───────────────────────────────────────────────────────────
 
@@ -50,11 +51,86 @@ function getThumbnailCursor(zone: Zone, dark: boolean, hasMultiple: boolean) {
   return makeArrowCursor(zone, dark)
 }
 
-// ─── Modal ────────────────────────────────────────────────────────────────────
+// ─── Mobile modal ─────────────────────────────────────────────────────────────
 
-type Phase = 'hidden' | 'snap' | 'play'
+interface MobileModalProps {
+  images: string[]
+  isDark: boolean
+  projectInfo: ProjectInfo
+  onClose: () => void
+}
 
-interface ModalProps {
+function MobileModal({ images, isDark, projectInfo, onClose }: MobileModalProps) {
+  const [visible, setVisible] = useState(false)
+  const bg = isDark ? '#0a0a0a' : '#ffffff'
+  const text1 = isDark ? '#ebebeb' : '#000000'
+  const text2 = isDark ? '#888888' : '#6E6E6E'
+  const text3 = isDark ? '#444444' : '#BDBDBD'
+
+  useEffect(() => { requestAnimationFrame(() => setVisible(true)) }, [])
+
+  const close = useCallback(() => {
+    setVisible(false)
+    setTimeout(onClose, 250)
+  }, [onClose])
+
+  useEffect(() => {
+    const fn = (e: KeyboardEvent) => { if (e.key === 'Escape') close() }
+    document.addEventListener('keydown', fn)
+    return () => document.removeEventListener('keydown', fn)
+  }, [close])
+
+  return createPortal(
+    <div style={{
+      position: 'fixed',
+      inset: 0,
+      zIndex: 9999,
+      background: bg,
+      overflowY: 'auto',
+      display: 'flex',
+      flexDirection: 'column',
+      opacity: visible ? 1 : 0,
+      transition: 'opacity 0.25s ease',
+    }}>
+      {/* Sticky header */}
+      <div style={{
+        position: 'sticky',
+        top: 0,
+        background: bg,
+        zIndex: 1,
+        padding: '20px 24px 16px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        borderBottom: `1px solid ${isDark ? '#2a2a2a' : '#e0e0e0'}`,
+      }}>
+        <div>
+          <p style={{ fontSize: 13, fontWeight: 700, color: text1 }}>{projectInfo.title}</p>
+          <p style={{ fontSize: 12, color: text3, marginTop: 2 }}>{projectInfo.company} / {projectInfo.year}</p>
+        </div>
+        <button onClick={close} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18, color: text2, padding: 4, lineHeight: 1 }}>✕</button>
+      </div>
+
+      {/* Description */}
+      <p style={{ padding: '20px 24px', fontSize: 13, lineHeight: '20px', color: text2 }}>
+        {projectInfo.description}
+      </p>
+
+      {/* All images stacked */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '0 24px 80px' }}>
+        {images.map((src, i) => (
+          <img key={i} src={src} alt={`${projectInfo.title} ${i + 1}`}
+            style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 4 }} />
+        ))}
+      </div>
+    </div>,
+    document.body
+  )
+}
+
+// ─── Desktop modal ────────────────────────────────────────────────────────────
+
+interface DesktopModalProps {
   images: string[]
   startIdx: number
   isDark: boolean
@@ -64,7 +140,7 @@ interface ModalProps {
   onClose: (finalIdx: number) => void
 }
 
-function Modal({ images, startIdx, isDark, originRect, getOriginRect, projectInfo, onClose }: ModalProps) {
+function DesktopModal({ images, startIdx, isDark, originRect, getOriginRect, projectInfo, onClose }: DesktopModalProps) {
   const [idx, setIdx] = useState(startIdx)
   const [phase, setPhase] = useState<Phase>('hidden')
   const [flipTransform, setFlipTransform] = useState('')
@@ -109,9 +185,7 @@ function Modal({ images, startIdx, isDark, originRect, getOriginRect, projectInf
     setClosing(true)
     setBackdropVisible(false)
     const freshDom = getOriginRect()
-    const fresh: Rect | null = freshDom
-      ? { x: freshDom.x, y: freshDom.y, width: freshDom.width, height: freshDom.height }
-      : null
+    const fresh = freshDom ? { x: freshDom.x, y: freshDom.y, width: freshDom.width, height: freshDom.height } : null
     const t = fresh ? computeFlipTo(fresh) : null
     if (t) {
       setFlipTransform(t)
@@ -146,117 +220,52 @@ function Modal({ images, startIdx, isDark, originRect, getOriginRect, projectInf
   const bgColor = isDark ? 'rgba(10,10,10,0.56)' : 'rgba(255,255,255,0.56)'
 
   return createPortal(
-    <div
-      onClick={close}
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 9999,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 48,
-        background: bgColor,
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        cursor: makeCloseCursor(isDark),
-        opacity: backdropVisible ? 1 : 0,
-        transition: 'opacity 0.3s ease',
-      }}
-    >
-      {/* ✕ button */}
-      <button
-        onClick={(e) => { e.stopPropagation(); close() }}
-        style={{
-          position: 'fixed',
-          top: 24,
-          right: 24,
-          zIndex: 10000,
-          background: isDark ? 'rgba(40,40,40,0.9)' : 'rgba(240,240,240,0.9)',
-          border: 'none',
-          borderRadius: '50%',
-          width: 36,
-          height: 36,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          fontSize: 16,
-          color: isDark ? '#ebebeb' : '#333333',
-        }}
-      >
-        ✕
-      </button>
+    <div onClick={close} style={{
+      position: 'fixed', inset: 0, zIndex: 9999,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 48,
+      background: bgColor, backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+      cursor: makeCloseCursor(isDark),
+      opacity: backdropVisible ? 1 : 0, transition: 'opacity 0.3s ease',
+    }}>
+      {/* ✕ */}
+      <button onClick={(e) => { e.stopPropagation(); close() }} style={{
+        position: 'fixed', top: 24, right: 24, zIndex: 10000,
+        background: isDark ? 'rgba(40,40,40,0.9)' : 'rgba(240,240,240,0.9)',
+        border: 'none', borderRadius: '50%', width: 36, height: 36,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        cursor: 'pointer', fontSize: 16, color: isDark ? '#ebebeb' : '#333333',
+      }}>✕</button>
 
-      {/* 1 + 4 column grid */}
-      <div
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 4fr',
-          gap: 16,
-          maxWidth: '90vw',
-          maxHeight: '90vh',
-          alignItems: 'stretch',
-          cursor: 'default',
-        }}
-      >
-        {/* Description panel — white box */}
-        <div
-          style={{
-            background: '#ffffff',
-            borderRadius: 8,
-            padding: 24,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 16,
-            overflowY: 'auto',
-            minWidth: 200,
-          }}
-        >
+      {/* 1 + 4 grid */}
+      <div onClick={(e) => e.stopPropagation()} style={{
+        display: 'grid', gridTemplateColumns: '1fr 4fr', gap: 16,
+        maxWidth: '90vw', maxHeight: '90vh', alignItems: 'stretch', cursor: 'default',
+      }}>
+        {/* Description */}
+        <div style={{
+          background: '#ffffff', borderRadius: 8, padding: 24,
+          display: 'flex', flexDirection: 'column', gap: 16, overflowY: 'auto', minWidth: 200,
+        }}>
           <div>
-            <p style={{ fontSize: 13, fontWeight: 700, lineHeight: '20px', color: '#000000' }}>
-              {projectInfo.title}
-            </p>
-            <p style={{ fontSize: 12, lineHeight: '18px', color: '#BDBDBD', marginTop: 2 }}>
-              {projectInfo.company} / {projectInfo.year}
-            </p>
+            <p style={{ fontSize: 13, fontWeight: 700, lineHeight: '20px', color: '#000000' }}>{projectInfo.title}</p>
+            <p style={{ fontSize: 12, lineHeight: '18px', color: '#BDBDBD', marginTop: 2 }}>{projectInfo.company} / {projectInfo.year}</p>
           </div>
-          <p style={{ fontSize: 13, lineHeight: '20px', color: '#6E6E6E' }}>
-            {projectInfo.description}
-          </p>
+          <p style={{ fontSize: 13, lineHeight: '20px', color: '#6E6E6E' }}>{projectInfo.description}</p>
         </div>
 
         {/* Image — FLIP target */}
-        <div
-          ref={imgRef}
-          onMouseMove={handleMouseMove}
-          onClick={handleImgClick}
-          style={{
-            transform: flipTransform || undefined,
-            transition: phase === 'play' ? `transform 0.45s ${EASE}` : 'none',
-            opacity: phase === 'hidden' ? 0 : 1,
-            transformOrigin: 'center center',
-            cursor: images.length > 1
-              ? makeArrowCursor(isLeft ? 'left' : 'right', isDark)
-              : 'default',
-            borderRadius: 8,
-            overflow: 'hidden',
-            flexShrink: 0,
-          }}
-        >
-          <img
-            src={images[idx]}
-            alt=""
-            style={{
-              display: 'block',
-              maxWidth: '100%',
-              maxHeight: '90vh',
-              width: 'auto',
-              height: 'auto',
-              objectFit: 'contain',
-            }}
-          />
+        <div ref={imgRef} onMouseMove={handleMouseMove} onClick={handleImgClick} style={{
+          transform: flipTransform || undefined,
+          transition: phase === 'play' ? `transform 0.45s ${EASE}` : 'none',
+          opacity: phase === 'hidden' ? 0 : 1,
+          transformOrigin: 'center center',
+          cursor: images.length > 1 ? makeArrowCursor(isLeft ? 'left' : 'right', isDark) : 'default',
+          borderRadius: 8, overflow: 'hidden', flexShrink: 0,
+        }}>
+          <img src={images[idx]} alt="" style={{
+            display: 'block', maxWidth: '100%', maxHeight: '90vh',
+            width: 'auto', height: 'auto', objectFit: 'contain',
+          }} />
         </div>
       </div>
     </div>,
@@ -277,19 +286,42 @@ export default function ImageCarousel({ images, alt, projectInfo }: Props) {
   const [zone, setZone] = useState<Zone>('middle')
   const [isDark, setIsDark] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const [originRect, setOriginRect] = useState<Rect>({ x: 0, y: 0, width: 0, height: 0 })
   const ref = useRef<HTMLDivElement>(null)
+  const touchStartX = useRef(0)
+  const isSwiping = useRef(false)
 
   const flat = images.flatMap(img => Array.isArray(img) ? img : [img])
   const getOriginRect = useCallback(() => ref.current?.getBoundingClientRect() ?? null, [])
 
   useEffect(() => {
-    const check = () => setIsDark(document.documentElement.classList.contains('dark'))
+    const check = () => {
+      setIsDark(document.documentElement.classList.contains('dark'))
+      setIsMobile(window.innerWidth < 768)
+    }
     check()
     const obs = new MutationObserver(check)
     obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-    return () => obs.disconnect()
+    window.addEventListener('resize', check)
+    return () => { obs.disconnect(); window.removeEventListener('resize', check) }
   }, [])
+
+  // Touch handlers for swipe
+  const handleTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    touchStartX.current = e.touches[0].clientX
+    isSwiping.current = false
+  }, [])
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    const delta = e.changedTouches[0].clientX - touchStartX.current
+    if (Math.abs(delta) >= 50 && images.length > 1) {
+      isSwiping.current = true
+      setIdx(i => delta > 0
+        ? (i - 1 + images.length) % images.length
+        : (i + 1) % images.length)
+    }
+  }, [images.length])
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const rect = ref.current?.getBoundingClientRect()
@@ -298,6 +330,7 @@ export default function ImageCarousel({ images, alt, projectInfo }: Props) {
   }, [])
 
   const handleClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (isSwiping.current) { isSwiping.current = false; return }
     const rect = ref.current?.getBoundingClientRect()
     if (!rect) return
     const z = getZone(e.clientX - rect.left, rect.width)
@@ -312,8 +345,8 @@ export default function ImageCarousel({ images, alt, projectInfo }: Props) {
     }
   }, [images.length])
 
-  const handleModalClose = useCallback((finalIdx: number) => {
-    setIdx(finalIdx)
+  const handleModalClose = useCallback((finalIdx?: number) => {
+    if (finalIdx !== undefined) setIdx(finalIdx)
     setModalOpen(false)
   }, [])
 
@@ -326,6 +359,8 @@ export default function ImageCarousel({ images, alt, projectInfo }: Props) {
         ref={ref}
         onMouseMove={handleMouseMove}
         onClick={handleClick}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
         style={{
           cursor: getThumbnailCursor(zone, isDark, hasMultiple),
           width: '100%',
@@ -335,6 +370,7 @@ export default function ImageCarousel({ images, alt, projectInfo }: Props) {
           overflow: 'hidden',
           transition: 'background 0.2s ease',
           position: 'relative',
+          touchAction: 'pan-y', // allow vertical scroll, intercept horizontal
         }}
       >
         {Array.isArray(current) ? (
@@ -348,15 +384,17 @@ export default function ImageCarousel({ images, alt, projectInfo }: Props) {
       </div>
 
       {modalOpen && projectInfo && (
-        <Modal
-          images={flat}
-          startIdx={flat.indexOf(Array.isArray(current) ? current[0] : current)}
-          isDark={isDark}
-          originRect={originRect}
-          getOriginRect={getOriginRect}
-          projectInfo={projectInfo}
-          onClose={handleModalClose}
-        />
+        isMobile
+          ? <MobileModal images={flat} isDark={isDark} projectInfo={projectInfo} onClose={() => handleModalClose()} />
+          : <DesktopModal
+              images={flat}
+              startIdx={flat.indexOf(Array.isArray(current) ? current[0] : current)}
+              isDark={isDark}
+              originRect={originRect}
+              getOriginRect={getOriginRect}
+              projectInfo={projectInfo}
+              onClose={handleModalClose}
+            />
       )}
     </>
   )
