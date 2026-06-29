@@ -90,7 +90,7 @@ export default function AboutSection() {
           <div>
             <p style={LABEL}>//. companies</p>
             <div style={{ marginBottom: 16 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
                 <p style={{ ...BODY, fontWeight: 500, color: 'var(--c-text-1)' }}>Product Designer roles</p>
                 <p style={{ fontSize: 12, lineHeight: '20px', color: 'var(--c-text-3)', whiteSpace: 'nowrap' }}>
                   [2019 → 2026]
@@ -99,7 +99,7 @@ export default function AboutSection() {
               <p style={BODY}>Sweep, Pennylane, Qonto, Proprioo</p>
             </div>
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
                 <p style={{ ...BODY, fontWeight: 500, color: 'var(--c-text-1)' }}>Art director roles</p>
                 <p style={{ fontSize: 12, lineHeight: '20px', color: 'var(--c-text-3)', whiteSpace: 'nowrap' }}>
                   [2015 → 2019]
