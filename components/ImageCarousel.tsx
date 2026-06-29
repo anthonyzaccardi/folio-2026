@@ -156,7 +156,11 @@ function DesktopModal({ images, startIdx, isDark, originRect, getOriginRect, pro
   const [isLeft, setIsLeft] = useState(false)
   const imgRef = useRef<HTMLDivElement>(null)
 
-  // No scroll lock on desktop — background scrolls freely
+  // Scroll lock — prevents background scroll while modal is open
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [])
 
   const computeFlipTo = useCallback((target: Rect) => {
     const el = imgRef.current

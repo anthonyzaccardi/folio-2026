@@ -56,14 +56,18 @@ a:hover { text-decoration: underline; }
 
 /* ─── Layout grids — 4 columns, 64px gutters ─────────── */
 
-/* About: 3 items in 4-col grid (4th col stays empty) */
 .about-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   column-gap: 64px;
 }
 
-/* Projects: each card spans 2 of 4 cols → 2 cards per row */
+/* Desktop: wrapper is transparent — children participate in parent grid directly */
+/* Mobile: wrapper becomes flex-column → companies then reach out stack vertically */
+.about-companies-reach {
+  display: contents;
+}
+
 .project-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -82,6 +86,12 @@ a:hover { text-decoration: underline; }
   .about-grid {
     grid-template-columns: 1fr;
     row-gap: 40px;
+  }
+  /* On mobile: wrapper becomes a real flex-column container */
+  .about-companies-reach {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
   }
   .project-grid {
     grid-template-columns: 1fr;
