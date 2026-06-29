@@ -6,9 +6,11 @@ import { createPortal } from 'react-dom'
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type Zone = 'left' | 'middle' | 'right'
+type SlideDir = 'left' | 'right'
+type SlidePhase = 'idle' | 'init' | 'animate'
 interface Rect { x: number; y: number; width: number; height: number }
 interface ProjectInfo { title: string; company: string; year: string; description: string }
-type Phase = 'hidden' | 'snap' | 'play'
+type FlipPhase = 'hidden' | 'snap' | 'play'
 
 // ─── Cursor helpers ───────────────────────────────────────────────────────────
 
@@ -51,7 +53,21 @@ function getThumbnailCursor(zone: Zone, dark: boolean, hasMultiple: boolean) {
   return makeArrowCursor(zone, dark)
 }
 
-// ─── Mobile modal ─────────────────────────────────────────────────────────────
+// ─── Image slot ───────────────────────────────────────────────────────────────
+
+function ImageSlot({ img, alt }: { img: string | [string, string]; alt: string }) {
+  if (Array.isArray(img)) {
+    return (
+      <div style={{ display: 'flex', width: '100%', height: '100%' }}>
+        <img src={img[0]} alt={`${alt} a`} style={{ width: '50%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        <img src={img[1]} alt={`${alt} b`} style={{ width: '50%', height: '100%', objectFit: 'cover', display: 'block' }} />
+      </div>
+    )
+  }
+  return <img src={img} alt={alt} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+}
+
+// ─── Mobile modal (scroll lock ON) ───────────────────────────────────────────
 
 interface MobileModalProps {
   images: string[]
@@ -66,6 +82,12 @@ function MobileModal({ images, isDark, projectInfo, onClose }: MobileModalProps)
   const text1 = isDark ? '#ebebeb' : '#000000'
   const text2 = isDark ? '#888888' : '#6E6E6E'
   const text3 = isDark ? '#444444' : '#BDBDBD'
+
+  // Mobile only: lock body scroll
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [])
 
   useEffect(() => { requestAnimationFrame(() => setVisible(true)) }, [])
 
@@ -82,26 +104,15 @@ function MobileModal({ images, isDark, projectInfo, onClose }: MobileModalProps)
 
   return createPortal(
     <div style={{
-      position: 'fixed',
-      inset: 0,
-      zIndex: 9999,
-      background: bg,
-      overflowY: 'auto',
-      display: 'flex',
-      flexDirection: 'column',
-      opacity: visible ? 1 : 0,
-      transition: 'opacity 0.25s ease',
+      position: 'fixed', inset: 0, zIndex: 9999,
+      background: bg, overflowY: 'auto',
+      display: 'flex', flexDirection: 'column',
+      opacity: visible ? 1 : 0, transition: 'opacity 0.25s ease',
     }}>
-      {/* Sticky header */}
       <div style={{
-        position: 'sticky',
-        top: 0,
-        background: bg,
-        zIndex: 1,
+        position: 'sticky', top: 0, background: bg, zIndex: 1,
         padding: '20px 24px 16px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
+        display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
         borderBottom: `1px solid ${isDark ? '#2a2a2a' : '#e0e0e0'}`,
       }}>
         <div>
@@ -110,13 +121,9 @@ function MobileModal({ images, isDark, projectInfo, onClose }: MobileModalProps)
         </div>
         <button onClick={close} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18, color: text2, padding: 4, lineHeight: 1 }}>✕</button>
       </div>
-
-      {/* Description */}
       <p style={{ padding: '20px 24px', fontSize: 13, lineHeight: '20px', color: text2 }}>
         {projectInfo.description}
       </p>
-
-      {/* All images stacked */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '0 24px 80px' }}>
         {images.map((src, i) => (
           <img key={i} src={src} alt={`${projectInfo.title} ${i + 1}`}
@@ -128,7 +135,7 @@ function MobileModal({ images, isDark, projectInfo, onClose }: MobileModalProps)
   )
 }
 
-// ─── Desktop modal ────────────────────────────────────────────────────────────
+// ─── Desktop modal (no scroll lock) ──────────────────────────────────────────
 
 interface DesktopModalProps {
   images: string[]
@@ -142,12 +149,14 @@ interface DesktopModalProps {
 
 function DesktopModal({ images, startIdx, isDark, originRect, getOriginRect, projectInfo, onClose }: DesktopModalProps) {
   const [idx, setIdx] = useState(startIdx)
-  const [phase, setPhase] = useState<Phase>('hidden')
+  const [phase, setPhase] = useState<FlipPhase>('hidden')
   const [flipTransform, setFlipTransform] = useState('')
   const [closing, setClosing] = useState(false)
   const [backdropVisible, setBackdropVisible] = useState(false)
   const [isLeft, setIsLeft] = useState(false)
   const imgRef = useRef<HTMLDivElement>(null)
+
+  // No scroll lock on desktop — background scrolls freely
 
   const computeFlipTo = useCallback((target: Rect) => {
     const el = imgRef.current
@@ -227,7 +236,6 @@ function DesktopModal({ images, startIdx, isDark, originRect, getOriginRect, pro
       cursor: makeCloseCursor(isDark),
       opacity: backdropVisible ? 1 : 0, transition: 'opacity 0.3s ease',
     }}>
-      {/* ✕ */}
       <button onClick={(e) => { e.stopPropagation(); close() }} style={{
         position: 'fixed', top: 24, right: 24, zIndex: 10000,
         background: isDark ? 'rgba(40,40,40,0.9)' : 'rgba(240,240,240,0.9)',
@@ -236,12 +244,10 @@ function DesktopModal({ images, startIdx, isDark, originRect, getOriginRect, pro
         cursor: 'pointer', fontSize: 16, color: isDark ? '#ebebeb' : '#333333',
       }}>✕</button>
 
-      {/* 1 + 4 grid */}
       <div onClick={(e) => e.stopPropagation()} style={{
         display: 'grid', gridTemplateColumns: '1fr 4fr', gap: 16,
         maxWidth: '90vw', maxHeight: '90vh', alignItems: 'stretch', cursor: 'default',
       }}>
-        {/* Description */}
         <div style={{
           background: '#ffffff', borderRadius: 8, padding: 24,
           display: 'flex', flexDirection: 'column', gap: 16, overflowY: 'auto', minWidth: 200,
@@ -253,7 +259,6 @@ function DesktopModal({ images, startIdx, isDark, originRect, getOriginRect, pro
           <p style={{ fontSize: 13, lineHeight: '20px', color: '#6E6E6E' }}>{projectInfo.description}</p>
         </div>
 
-        {/* Image — FLIP target */}
         <div ref={imgRef} onMouseMove={handleMouseMove} onClick={handleImgClick} style={{
           transform: flipTransform || undefined,
           transition: phase === 'play' ? `transform 0.45s ${EASE}` : 'none',
@@ -281,16 +286,29 @@ interface Props {
   projectInfo?: ProjectInfo
 }
 
+const SLIDE_EASE = 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+const SLIDE_MS = 380
+
 export default function ImageCarousel({ images, alt, projectInfo }: Props) {
   const [idx, setIdx] = useState(0)
+  // Slide state — only used on mobile touch navigation
+  const [prevIdx, setPrevIdx] = useState<number | null>(null)
+  const [slideDir, setSlideDir] = useState<SlideDir>('right')
+  const [slidePhase, setSlidePhase] = useState<SlidePhase>('idle')
+
   const [zone, setZone] = useState<Zone>('middle')
   const [isDark, setIsDark] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [originRect, setOriginRect] = useState<Rect>({ x: 0, y: 0, width: 0, height: 0 })
+
   const ref = useRef<HTMLDivElement>(null)
   const touchStartX = useRef(0)
   const isSwiping = useRef(false)
+  const isSliding = useRef(false)
+  const idxRef = useRef(0)
+
+  useEffect(() => { idxRef.current = idx }, [idx])
 
   const flat = images.flatMap(img => Array.isArray(img) ? img : [img])
   const getOriginRect = useCallback(() => ref.current?.getBoundingClientRect() ?? null, [])
@@ -307,7 +325,41 @@ export default function ImageCarousel({ images, alt, projectInfo }: Props) {
     return () => { obs.disconnect(); window.removeEventListener('resize', check) }
   }, [])
 
-  // Touch handlers for swipe
+  // Mobile-only: slide animation navigation
+  const navigateWithSlide = useCallback((dir: SlideDir) => {
+    if (isSliding.current || images.length <= 1) return
+    isSliding.current = true
+    const curr = idxRef.current
+    const next = dir === 'right'
+      ? (curr + 1) % images.length
+      : (curr - 1 + images.length) % images.length
+    setPrevIdx(curr)
+    setSlideDir(dir)
+    setIdx(next)
+    idxRef.current = next
+    setSlidePhase('init')
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => { setSlidePhase('animate') })
+    })
+    setTimeout(() => {
+      setPrevIdx(null)
+      setSlidePhase('idle')
+      isSliding.current = false
+    }, SLIDE_MS + 20)
+  }, [images.length])
+
+  // Desktop-only: instant navigation (no animation)
+  const navigateInstant = useCallback((dir: SlideDir) => {
+    if (images.length <= 1) return
+    const curr = idxRef.current
+    const next = dir === 'right'
+      ? (curr + 1) % images.length
+      : (curr - 1 + images.length) % images.length
+    idxRef.current = next
+    setIdx(next)
+  }, [images.length])
+
+  // Touch handlers — mobile swipe with slide animation
   const handleTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
     touchStartX.current = e.touches[0].clientX
     isSwiping.current = false
@@ -315,13 +367,11 @@ export default function ImageCarousel({ images, alt, projectInfo }: Props) {
 
   const handleTouchEnd = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
     const delta = e.changedTouches[0].clientX - touchStartX.current
-    if (Math.abs(delta) >= 50 && images.length > 1) {
+    if (Math.abs(delta) >= 50) {
       isSwiping.current = true
-      setIdx(i => delta > 0
-        ? (i - 1 + images.length) % images.length
-        : (i + 1) % images.length)
+      navigateWithSlide(delta > 0 ? 'left' : 'right')
     }
-  }, [images.length])
+  }, [navigateWithSlide])
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const rect = ref.current?.getBoundingClientRect()
@@ -329,29 +379,39 @@ export default function ImageCarousel({ images, alt, projectInfo }: Props) {
     setZone(getZone(e.clientX - rect.left, rect.width))
   }, [])
 
+  // Click handler — desktop only (instant navigation, no slide)
   const handleClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (isSwiping.current) { isSwiping.current = false; return }
     const rect = ref.current?.getBoundingClientRect()
     if (!rect) return
     const z = getZone(e.clientX - rect.left, rect.width)
-    if (z === 'left' && images.length > 1) {
-      setIdx(i => (i - 1 + images.length) % images.length)
-    } else if (z === 'right' && images.length > 1) {
-      setIdx(i => (i + 1) % images.length)
-    } else if (z === 'middle') {
+    if (z === 'left') {
+      navigateInstant('left')
+    } else if (z === 'right') {
+      navigateInstant('right')
+    } else {
       const domRect = ref.current?.getBoundingClientRect()
       if (domRect) setOriginRect({ x: domRect.x, y: domRect.y, width: domRect.width, height: domRect.height })
       setModalOpen(true)
     }
-  }, [images.length])
+  }, [navigateInstant])
 
   const handleModalClose = useCallback((finalIdx?: number) => {
-    if (finalIdx !== undefined) setIdx(finalIdx)
+    if (finalIdx !== undefined) { idxRef.current = finalIdx; setIdx(finalIdx) }
     setModalOpen(false)
   }, [])
 
   const current = images[idx]
   const hasMultiple = images.length > 1
+
+  // Slide transforms (only active during mobile touch navigation)
+  const exitTransform = slidePhase === 'animate'
+    ? `translateX(${slideDir === 'right' ? '-100%' : '100%'})`
+    : 'translateX(0)'
+  const enterTransform = slidePhase === 'init'
+    ? `translateX(${slideDir === 'right' ? '100%' : '-100%'})`
+    : 'translateX(0)'
+  const slideTransition = `transform ${SLIDE_MS}ms ${SLIDE_EASE}`
 
   return (
     <>
@@ -368,19 +428,30 @@ export default function ImageCarousel({ images, alt, projectInfo }: Props) {
           background: 'var(--c-surface)',
           borderRadius: 2,
           overflow: 'hidden',
-          transition: 'background 0.2s ease',
           position: 'relative',
-          touchAction: 'pan-y', // allow vertical scroll, intercept horizontal
+          touchAction: 'pan-y',
         }}
       >
-        {Array.isArray(current) ? (
-          <div style={{ display: 'flex', width: '100%', height: '100%' }}>
-            <img src={current[0]} alt={`${alt} a`} style={{ width: '50%', height: '100%', objectFit: 'cover', display: 'block' }} />
-            <img src={current[1]} alt={`${alt} b`} style={{ width: '50%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        {/* Exiting image — only rendered during mobile slide */}
+        {prevIdx !== null && (
+          <div style={{
+            position: 'absolute', inset: 0,
+            transform: exitTransform,
+            transition: slidePhase === 'animate' ? slideTransition : 'none',
+            willChange: 'transform',
+          }}>
+            <ImageSlot img={images[prevIdx]} alt={alt} />
           </div>
-        ) : (
-          <img src={current} alt={alt} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
         )}
+        {/* Current image */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          transform: enterTransform,
+          transition: slidePhase === 'animate' ? slideTransition : 'none',
+          willChange: 'transform',
+        }}>
+          <ImageSlot img={current} alt={alt} />
+        </div>
       </div>
 
       {modalOpen && projectInfo && (
